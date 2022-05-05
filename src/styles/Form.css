@@ -2,7 +2,8 @@
     border:1px solid grey;
     width:300px;
     padding:20px;
-    height:90vh;
+    height:93vh;
+    margin-left:10px;
 }
 
 .form__item{
@@ -26,4 +27,17 @@
     display: block;
     margin-left:auto;
     margin-right:auto;
+}
+
+.form__span{
+    font-size:14px;
+}
+
+.absolute{
+    position:absolute;
+    right:10px;
+}
+
+.bg-green{
+    background-color: #adebad;
 }

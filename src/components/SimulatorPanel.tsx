@@ -4,10 +4,27 @@ import '../styles/SimulatorPanel.css'
 
 interface SimulatorPanelProps{
     today:string,
-    final:string
+    final:string,
+    totalPayment:number,
+    monthlyPayment:number,
+    mainDebt:number,
+    interestAmount:number,
+    setTotalPayment:(payment:number) => void,
+    setMainDebt:(amount:number) => void,
+    setInterestAmount:(amount:number) => void,
 }
 
-const SimulatorPanel:FC<SimulatorPanelProps> = ({today, final}) => {
+const SimulatorPanel:FC<SimulatorPanelProps> = ({
+        today, 
+        final, 
+        setTotalPayment, 
+        totalPayment, 
+        monthlyPayment, 
+        mainDebt, 
+        interestAmount,
+        setMainDebt,
+        setInterestAmount
+    }) => {
 
     const [todayDate, setTodayDate] = useState<string>('');
     const [todayDateDisplay, setTodayDateDisplay] = useState<string>('');
@@ -20,7 +37,37 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({today, final}) => {
         setPaymentDate(today)
     }, [final])
 
-
+    function payDebt() {
+        if((totalPayment - monthlyPayment) > monthlyPayment){
+            totalPayment -= monthlyPayment;
+            setTotalPayment(totalPayment);
+        } else {
+            var lastAmount = totalPayment;
+            totalPayment -= lastAmount;
+            setTotalPayment(totalPayment);
+        }
+        if(mainDebt > monthlyPayment) {
+            mainDebt -= monthlyPayment;
+            console.log(mainDebt)
+            setMainDebt(mainDebt);
+        } else if(mainDebt < monthlyPayment && mainDebt > 0) {
+            var sum = monthlyPayment-mainDebt;
+            var lastAmount = mainDebt;
+            mainDebt -= lastAmount;
+            interestAmount -= sum;
+            setInterestAmount(interestAmount);
+            setMainDebt(mainDebt);
+        } else {
+            if(interestAmount > monthlyPayment) {
+                interestAmount -= monthlyPayment;
+                setInterestAmount(interestAmount);
+            } else {
+                var lastAmount = interestAmount;
+                interestAmount -= lastAmount;
+                setInterestAmount(interestAmount);
+            }   
+        }
+    }
 
     function skipDay() {
         const date = new Date(todayDate);
@@ -30,7 +77,8 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({today, final}) => {
         if(date.getDate() === new Date(paymentDate).getDate()){
             let pay = prompt("Pay? press y or n")
             if(pay === 'y'){
-                console.log("payed");
+                payDebt()
+                
             } else {
                 console.log("not payed")
             }
@@ -46,7 +94,7 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({today, final}) => {
             setTimeout(function() {
                 let pay = prompt("Pay? press y or n")
                 if(pay === 'y'){
-                    console.log("payed");
+                    payDebt()
                 } else {
                     console.log("not payed")
                 }
@@ -63,12 +111,16 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({today, final}) => {
             Симулятор
         </div>
         <div className='wrapper'>
+        <div className='date__wrapper'>
+                <span>День платежа: </span>
+                <input type='text' className='date__input' value={new Date(paymentDate).toLocaleDateString()} />
+            </div>
             <div className='date__wrapper'>
                 <span>Сегодня: </span>
                 <input type='text' className='date__input' value={todayDateDisplay} />
             </div>
             <div className='date__wrapper'>
-                <span>Конечная дата погашения: </span>
+                <span>Дата погашения: </span>
                 <input type='text' className='date__input' value={final} />
             </div>
         </div>

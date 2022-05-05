@@ -3,16 +3,34 @@ import '../styles/Form.css'
 
 interface FormProps{
     setTodayDate:(date:string) => void,
-    setFinalDate:(date:string) => void
+    setFinalDate:(date:string) => void,
+    setMonthly:(payment:number) => void,
+    setTotalPayment:(payment:number) => void,
+    setPayment:(payment:number) => void,
+    setInterestPayment:(payment:number) => void,
+    totalPayment:number,
+    mainDebt:number,
+    interestAmount:number,
 }
 
-const Form:FC<FormProps> = ({setTodayDate, setFinalDate}) => { 
+const Form:FC<FormProps> = ({
+    setTodayDate, 
+    setFinalDate, 
+    setMonthly, 
+    setTotalPayment, 
+    setPayment, 
+    setInterestPayment, 
+    totalPayment,
+    mainDebt,
+    interestAmount
+    }) => { 
 
     const [amount, setAmount] = useState<string>('');
     const [monthlyPayment, setMonthlyPayment] = useState<string>('');
     const [paymentDate, setPaymentDate] = useState<string>('');
     const [interest, setInterest] = useState<string>('');
     const [pentalty, setPenalty] = useState<string>('');
+    const [show, setShow] = useState<boolean>(false);
 
     function start() {
         const amountN = parseInt(amount);
@@ -22,6 +40,11 @@ const Form:FC<FormProps> = ({setTodayDate, setFinalDate}) => {
 
         const totalPayment = amountN+(amountN*interestN/100);
         findFinalPaymentDate(totalPayment, monthlyPaymentN)
+        setMonthly(monthlyPaymentN)
+        setTotalPayment(totalPayment)
+        setShow(true);
+        setPayment(amountN)
+        setInterestPayment(amountN*interestN/100)
     }
 
     function findFinalPaymentDate(total:number, monthly:number) {
@@ -57,6 +80,23 @@ const Form:FC<FormProps> = ({setTodayDate, setFinalDate}) => {
         <div className='form__item'>
             <button className='btn__start' onClick={start}>Начать</button>
         </div>
+        <hr/>
+        { show ?
+            <div>
+                <div className='form__item bg-green'>
+                    <span className='form__span'>Сумма погашения:</span>
+                    <span className='form__span absolute'>{totalPayment}</span>
+                </div>
+                <div className='form__item'>
+                    <span className='form__span' >Основной долг:</span>
+                    <span className='form__span absolute' >{mainDebt}</span>
+                </div>
+                <div className='form__item'>
+                    <span className='form__span' >Проценты:</span>
+                    <span className='form__span absolute' >{interestAmount}</span>
+                </div> 
+            </div>
+        : null}
     </div>
   )
 }
