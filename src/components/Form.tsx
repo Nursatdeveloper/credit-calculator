@@ -1,7 +1,12 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import '../styles/Form.css'
 
-const Form = () => { 
+interface FormProps{
+    setTodayDate:(date:string) => void,
+    setFinalDate:(date:string) => void
+}
+
+const Form:FC<FormProps> = ({setTodayDate, setFinalDate}) => { 
 
     const [amount, setAmount] = useState<string>('');
     const [monthlyPayment, setMonthlyPayment] = useState<string>('');
@@ -13,11 +18,18 @@ const Form = () => {
         const amountN = parseInt(amount);
         const monthlyPaymentN = parseInt(monthlyPayment);
         const interestN = parseInt(interest);
-        const pentaltyN = parseInt(pentalty)
+        const pentaltyN = parseInt(pentalty);
+
+        const totalPayment = amountN+(amountN*interestN/100);
+        findFinalPaymentDate(totalPayment, monthlyPaymentN)
     }
 
-    function findFinalPaymentDate() {
-
+    function findFinalPaymentDate(total:number, monthly:number) {
+        var month = Math.ceil(total/monthly);
+        var date = new Date(paymentDate);
+        var finalPaymentDate = new Date(date.setMonth(date.getMonth()+month));
+        setFinalDate(finalPaymentDate.toLocaleDateString());
+        setTodayDate(paymentDate)
     }
 
   return (
