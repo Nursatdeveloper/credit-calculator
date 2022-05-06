@@ -8,6 +8,7 @@ interface FormProps{
     setTotalPayment:(payment:number) => void,
     setPayment:(payment:number) => void,
     setInterestPayment:(payment:number) => void,
+    setPenaltyRate:(rate:number) => void,
     totalPayment:number,
     mainDebt:number,
     interestAmount:number,
@@ -20,6 +21,7 @@ const Form:FC<FormProps> = ({
     setTotalPayment, 
     setPayment, 
     setInterestPayment, 
+    setPenaltyRate,
     totalPayment,
     mainDebt,
     interestAmount
@@ -36,8 +38,7 @@ const Form:FC<FormProps> = ({
         const amountN = parseInt(amount);
         const monthlyPaymentN = parseInt(monthlyPayment);
         const interestN = parseInt(interest);
-        const pentaltyN = parseInt(pentalty);
-
+        const pentaltyN = parseFloat(pentalty);
         const totalPayment = amountN+(amountN*interestN/100);
         findFinalPaymentDate(totalPayment, monthlyPaymentN)
         setMonthly(monthlyPaymentN)
@@ -45,13 +46,14 @@ const Form:FC<FormProps> = ({
         setShow(true);
         setPayment(amountN)
         setInterestPayment(amountN*interestN/100)
+        setPenaltyRate(pentaltyN)
     }
 
     function findFinalPaymentDate(total:number, monthly:number) {
         var month = Math.ceil(total/monthly);
         var date = new Date(paymentDate);
         var finalPaymentDate = new Date(date.setMonth(date.getMonth()+month));
-        setFinalDate(finalPaymentDate.toLocaleDateString());
+        setFinalDate(finalPaymentDate.toISOString());
         setTodayDate(paymentDate)
     }
 

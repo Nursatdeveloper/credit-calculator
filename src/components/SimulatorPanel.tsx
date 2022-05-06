@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react'
-import incrementDate from '../helpers/incrementDate';
 import '../styles/SimulatorPanel.css'
 
 interface SimulatorPanelProps{
@@ -9,9 +8,11 @@ interface SimulatorPanelProps{
     monthlyPayment:number,
     mainDebt:number,
     interestAmount:number,
+    penaltyRate:number,
     setTotalPayment:(payment:number) => void,
     setMainDebt:(amount:number) => void,
     setInterestAmount:(amount:number) => void,
+    setFinalDate:(date:string) => void
 }
 
 const SimulatorPanel:FC<SimulatorPanelProps> = ({
@@ -22,8 +23,10 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
         monthlyPayment, 
         mainDebt, 
         interestAmount,
+        penaltyRate,
         setMainDebt,
-        setInterestAmount
+        setInterestAmount,
+        setFinalDate
     }) => {
 
     const [todayDate, setTodayDate] = useState<string>('');
@@ -31,10 +34,11 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
     const [paymentDate, setPaymentDate] = useState<string>('');
 
 
+
     useEffect(() => {
-        setTodayDate(today)
-        setTodayDateDisplay(new Date(today).toLocaleDateString())
-        setPaymentDate(today)
+        setTodayDate(today);
+        setTodayDateDisplay(new Date(today).toLocaleDateString());
+        setPaymentDate(today);
     }, [final])
 
     function payDebt() {
@@ -48,7 +52,6 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
         }
         if(mainDebt > monthlyPayment) {
             mainDebt -= monthlyPayment;
-            console.log(mainDebt)
             setMainDebt(mainDebt);
         } else if(mainDebt < monthlyPayment && mainDebt > 0) {
             var sum = monthlyPayment-mainDebt;
@@ -69,6 +72,15 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
         }
     }
 
+    function makePenalty(){
+        var penaltyAmount = monthlyPayment * penaltyRate;
+        interestAmount += penaltyAmount;
+        setInterestAmount(interestAmount);
+        const date = new Date(final);
+        date.setMonth(date.getMonth()+1)
+        setFinalDate(date.toISOString());
+    }
+
     function skipDay() {
         const date = new Date(todayDate);
         date.setDate(date.getDate() + 1);
@@ -77,10 +89,9 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
         if(date.getDate() === new Date(paymentDate).getDate()){
             let pay = prompt("Pay? press y or n")
             if(pay === 'y'){
-                payDebt()
-                
+                payDebt()             
             } else {
-                console.log("not payed")
+                makePenalty()
             }
         }
     }
@@ -96,7 +107,7 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
                 if(pay === 'y'){
                     payDebt()
                 } else {
-                    console.log("not payed")
+                    makePenalty()
                 }
             }, 400)
             
@@ -121,7 +132,7 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
             </div>
             <div className='date__wrapper'>
                 <span>Дата погашения: </span>
-                <input type='text' className='date__input' value={final} />
+                <input type='text' className='date__input' value={new Date(final).toLocaleDateString()} />
             </div>
         </div>
         <div className='btn__container'>

@@ -11,9 +11,9 @@ function App() {
   const [payment, setPayment] = useState<number>(0);
   const [interestPayment, setInterestPayment] = useState<number>(0);
   const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
+  const [penaltyRate, setPenaltyRate] = useState<number>(0);
 
   useEffect(() => {
-    console.log(totalPayment)
   }, [totalPayment])
 
   return (
@@ -29,6 +29,7 @@ function App() {
           setInterestPayment={setInterestPayment}
           mainDebt={payment}
           interestAmount={interestPayment}
+          setPenaltyRate={setPenaltyRate}
         />
       </div>
       <div className='table__container'>
@@ -42,6 +43,8 @@ function App() {
           interestAmount={interestPayment}
           setMainDebt={setPayment}
           setInterestAmount={setInterestPayment}
+          penaltyRate={penaltyRate}
+          setFinalDate={setFinalDate}
         />
       </div>
     </div>
