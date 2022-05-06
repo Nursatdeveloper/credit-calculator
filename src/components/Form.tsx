@@ -47,6 +47,7 @@ const Form:FC<FormProps> = ({
         setPayment(amountN)
         setInterestPayment(amountN*interestN/100)
         setPenaltyRate(pentaltyN)
+        
     }
 
     function findFinalPaymentDate(total:number, monthly:number) {

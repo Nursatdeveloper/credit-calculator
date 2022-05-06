@@ -1,0 +1,29 @@
+.table__wrapper {
+    border:1px solid black;
+    margin-top:15px;
+}
+.table__body{
+    overflow-y: scroll;
+    height:75.7vh
+}
+
+.table__title{
+    text-align: center;
+    font-size:18px;
+    padding-bottom:10px;
+    padding-top:10px;
+    background-color: #f2f2f2;
+    border-bottom:1px solid black;
+}
+
+.table__row{
+    display: flex;
+    padding-left:15px;
+    padding-right:15px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+.center{
+    width: 25%;
+    text-align: center;
+}

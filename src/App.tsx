@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import Form from './components/Form';
+import PaymentTable from './components/PaymentTable';
 import SimulatorPanel from './components/SimulatorPanel';
 
 function App() {
@@ -45,6 +46,10 @@ function App() {
           setInterestAmount={setInterestPayment}
           penaltyRate={penaltyRate}
           setFinalDate={setFinalDate}
+          setMonthlyPayment={setMonthlyPayment}
+        />
+        <PaymentTable 
+          totalAmount={totalPayment}
         />
       </div>
     </div>

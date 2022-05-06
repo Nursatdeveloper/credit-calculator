@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
+import Table from '../helpers/Table';
 import '../styles/SimulatorPanel.css'
 
 interface SimulatorPanelProps{
@@ -12,7 +13,8 @@ interface SimulatorPanelProps{
     setTotalPayment:(payment:number) => void,
     setMainDebt:(amount:number) => void,
     setInterestAmount:(amount:number) => void,
-    setFinalDate:(date:string) => void
+    setFinalDate:(date:string) => void,
+    setMonthlyPayment:(payment:number) => void
 }
 
 const SimulatorPanel:FC<SimulatorPanelProps> = ({
@@ -26,7 +28,8 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
         penaltyRate,
         setMainDebt,
         setInterestAmount,
-        setFinalDate
+        setFinalDate,
+        setMonthlyPayment
     }) => {
 
     const [todayDate, setTodayDate] = useState<string>('');
@@ -39,18 +42,56 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
         setTodayDate(today);
         setTodayDateDisplay(new Date(today).toLocaleDateString());
         setPaymentDate(today);
-    }, [final])
+    }, [penaltyRate])
+
+    function addPaymentToTable(monthlyPayment:string, leftAmount:string) {
+        var payment:Table = {
+            date: todayDateDisplay,
+            monthlyPayment: monthlyPayment,
+            status:'Оплачен',
+            leftAmount: leftAmount,
+            color: '#adebad'
+        }
+        var allPayments = sessionStorage.getItem('payments')
+        if(allPayments === null) {
+            sessionStorage.setItem('payments', JSON.stringify([payment]));
+            console.log('1')
+        } else {
+            var payments: Table[] = JSON.parse(allPayments)
+            payments.push(payment)
+            sessionStorage.setItem('payments', JSON.stringify(payments))
+        }
+    }
+
+    function addPenaltyToTable(penaltyAmount:string) {
+        var payment:Table = {
+            date: todayDateDisplay,
+            monthlyPayment: penaltyAmount,
+            status:'Не оплачен',
+            leftAmount: totalPayment.toString(),
+            color: '#ff8080'
+        }
+        var allPayments = sessionStorage.getItem('payments')
+        if(allPayments === null) {
+            sessionStorage.setItem('payments', JSON.stringify([payment]));
+        } else {
+            var payments: Table[] = JSON.parse(allPayments)
+            payments.push(payment)
+            sessionStorage.setItem('payments', JSON.stringify(payments))
+
+        }
+    }
 
     function payDebt() {
-        if((totalPayment - monthlyPayment) > monthlyPayment){
+        if(totalPayment > monthlyPayment){
             totalPayment -= monthlyPayment;
-            setTotalPayment(totalPayment);
-        } else {
-            var lastAmount = totalPayment;
-            totalPayment -= lastAmount;
-            setTotalPayment(totalPayment);
+            setTotalPayment(totalPayment);   
+            if(totalPayment < monthlyPayment){
+                setMonthlyPayment(totalPayment);
+            }      
         }
-        if(mainDebt > monthlyPayment) {
+
+        if(mainDebt >= monthlyPayment) {
             mainDebt -= monthlyPayment;
             setMainDebt(mainDebt);
         } else if(mainDebt < monthlyPayment && mainDebt > 0) {
@@ -67,18 +108,24 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
             } else {
                 var lastAmount = interestAmount;
                 interestAmount -= lastAmount;
+                totalPayment = 0;
+                setTotalPayment(totalPayment)
                 setInterestAmount(interestAmount);
             }   
         }
+        addPaymentToTable(monthlyPayment.toString(), totalPayment.toString());
     }
 
     function makePenalty(){
-        var penaltyAmount = monthlyPayment * penaltyRate;
+        var penaltyAmount = monthlyPayment * (penaltyRate/100);
         interestAmount += penaltyAmount;
+        totalPayment += penaltyAmount;
         setInterestAmount(interestAmount);
+        setTotalPayment(totalPayment)
         const date = new Date(final);
         date.setMonth(date.getMonth()+1)
         setFinalDate(date.toISOString());
+        addPenaltyToTable(penaltyAmount.toString());
     }
 
     function skipDay() {
@@ -98,23 +145,32 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
 
     function skipMonth() {
         const date = new Date(todayDate);
-        date.setMonth(date.getMonth()+1);
-        setTodayDateDisplay(date.toLocaleDateString());
-        setTodayDate(date.toISOString());
-        if(date.getDate() === new Date(paymentDate).getDate()){
-            setTimeout(function() {
-                let pay = prompt("Pay? press y or n")
-                if(pay === 'y'){
-                    payDebt()
-                } else {
-                    makePenalty()
-                }
-            }, 400)
-            
+        console.log(date)
+        console.log(new Date(final))
+        if(date.toLocaleDateString() !== new Date(final).toLocaleDateString()){
+            date.setMonth(date.getMonth()+1);
+            setTodayDateDisplay(date.toLocaleDateString());
+            setTodayDate(date.toISOString());
+            if(date.getDate() === new Date(paymentDate).getDate()){
+                setTimeout(function() {
+                    let pay = prompt("Pay? press y or n")
+                    if(pay === 'y'){
+                        payDebt()
+                    } else {
+                        makePenalty()
+                    }
+                }, 400)
+                
+            }
+        } else {
+            return alert("Поздравляем вы погасили займ!");
         }
     }
 
-
+    function clearTable() {
+        sessionStorage.removeItem('payments');
+        window.location.reload()
+    }
 
   return (
     <div className='sp__wrapper'>
@@ -142,6 +198,9 @@ const SimulatorPanel:FC<SimulatorPanelProps> = ({
                 </div>
                 <div className='btn__wrapper'>
                     <button onClick={skipMonth}>Пропустить месяц</button>
+                </div>
+                <div className='btn__wrapper'>
+                    <button onClick={clearTable}>Очистить таблицу</button>
                 </div>
             </div>
         </div>
